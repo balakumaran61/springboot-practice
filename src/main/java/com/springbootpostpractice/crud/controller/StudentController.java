@@ -73,6 +73,12 @@ public class StudentController
     ) {
         return studentService.updateStudentEmail(studentId, studentUpdateDto.getEmail());
     }
+    @PostMapping("/batch-update")
+    public List<studentDto> batchUpdateStudents(@RequestBody List<studentDto> studentDtoList)
+    {
+        return studentService.batchUpdateStudents(studentDtoList);
+    }
+
 
 
 

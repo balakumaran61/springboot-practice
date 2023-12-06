@@ -19,6 +19,4 @@ public class Student
     private String rollno;
     private int age;
 
-
-
 }

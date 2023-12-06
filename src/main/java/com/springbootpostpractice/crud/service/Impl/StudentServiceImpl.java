@@ -6,11 +6,14 @@ import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
 import com.springbootpostpractice.crud.repository.StudentRepository;
 import com.springbootpostpractice.crud.service.StudentService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,7 +121,8 @@ public class StudentServiceImpl implements StudentService
     }
     @Override
     @Transactional
-    public String updateStudentEmail(Integer studentId, String email) {
+    public String updateStudentEmail(Integer studentId, String email)
+    {
         int updatedRows = studentRepository.updateStudentEmail(studentId, email);
         if (updatedRows > 0) {
             return "email updated";
@@ -126,4 +130,51 @@ public class StudentServiceImpl implements StudentService
             return "email not updated";
         }
     }
+    @Override
+    public List<studentDto> batchUpdateStudents(List<studentDto> studentDtoList) {
+        List<studentDto> updatedStudentDtos = new ArrayList<>();
+
+        for (studentDto inputStudentDto : studentDtoList) {
+            Optional<Student> existingStudentOptional = studentRepository.findById(inputStudentDto.getStudentId());
+
+            if (existingStudentOptional.isPresent()) {
+                // Student exists in the database, update its fields
+                Student existingStudent = existingStudentOptional.get();
+                updateEntityFromDto(existingStudent, inputStudentDto);
+                studentRepository.save(existingStudent);
+                updatedStudentDtos.add(convertEntityToDto(existingStudent));
+            } else {
+                // Student does not exist in the database, create a new entity
+                Student newStudent = convertDtoToEntity(inputStudentDto);
+                studentRepository.save(newStudent);
+                updatedStudentDtos.add(convertEntityToDto(newStudent));
+            }
+        }
+
+        return updatedStudentDtos;
+    }
+
+
+    private void updateEntityFromDto(Student student, studentDto studentDto) {
+        // Update fields of the existing entity with data from the DTO
+        student.setName(studentDto.getName());
+        student.setRollno(studentDto.getRollno());
+        student.setEmail(studentDto.getEmail());
+        student.setAge(studentDto.getAge());
+        // You can update other fields as needed
+    }
+
+    private Student convertDtoToEntity(studentDto studentDto) {
+        Student student = new Student();
+        BeanUtils.copyProperties(studentDto, student);
+        return student;
+    }
+
+    private studentDto convertEntityToDto(Student student) {
+        studentDto studDto = new studentDto();
+        BeanUtils.copyProperties(student, studDto);
+        return studDto;
+    }
 }
+
+

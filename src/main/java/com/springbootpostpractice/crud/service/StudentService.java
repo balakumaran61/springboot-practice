@@ -22,6 +22,8 @@ public interface StudentService
     studentDto updateStudent(Integer studentId, StudentUpdateDto studentUpdateDto);
 
     String updateStudentEmail(Integer studentId, String email);
+    List<studentDto> batchUpdateStudents(List<studentDto> studentDtoList);
+
 
 
 }
