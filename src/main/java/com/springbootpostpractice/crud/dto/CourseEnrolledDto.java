@@ -1,4 +1,11 @@
 package com.springbootpostpractice.crud.dto;
 
-public class CourseEnrolledDto {
+import lombok.Data;
+
+@Data
+public class CourseEnrolledDto
+{
+    private String courseCode;
+    private Integer StudentId;
+
 }
