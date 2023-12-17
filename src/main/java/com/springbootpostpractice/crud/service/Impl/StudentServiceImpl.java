@@ -1,14 +1,23 @@
 package com.springbootpostpractice.crud.service.Impl;
-import com.springbootpostpractice.crud.dto.StudentUpdateDto;
-import com.springbootpostpractice.crud.dto.studentDto;
+import com.springbootpostpractice.crud.dto.*;
+import com.springbootpostpractice.crud.model.CourseEnrolled;
 import com.springbootpostpractice.crud.model.Student;
+import com.springbootpostpractice.crud.repository.Projection.StudentPageProjection;
 import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
 import com.springbootpostpractice.crud.repository.StudentRepository;
 import com.springbootpostpractice.crud.service.StudentService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +31,10 @@ public class StudentServiceImpl implements StudentService
     @Autowired
     StudentRepository studentRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
+
     @Override
     public Student create(Student student)
     {
@@ -29,8 +42,14 @@ public class StudentServiceImpl implements StudentService
     }
 
     @Override
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public Page<StudentPageProjection> getStudentPage(Pageable pageble) {
+        return null;
+    }
+
+    @Override
+    public List<StudentProjection> getAllStudents()
+    {
+        return studentRepository.findAllProjectedBy();
     }
 
     @Override
@@ -175,6 +194,72 @@ public class StudentServiceImpl implements StudentService
         BeanUtils.copyProperties(student, studDto);
         return studDto;
     }
+
+
+
+
+    @Transactional
+    @Override
+    public String saveStudentUsingEm(Student student) {
+        entityManager.persist(student);
+        return "Student saved successfully";
+    }
+    @Override
+    public studDto getStudentDetailsWithEM(Integer studentId)
+    {
+        String queryString = "SELECT name, rollno, email, age FROM Student WHERE id = :studentId";
+        Query nativeQuery = entityManager.createNativeQuery(queryString);
+        nativeQuery.setParameter("studentId", studentId);
+
+        Object[] result = (Object[]) nativeQuery.getSingleResult();
+
+        if (result != null && result.length == 4) {
+            // Assuming the order is name, rollno, email, age
+            String name = (String) result[0];
+            String rollno = (String) result[1];
+            String email = (String) result[2];
+            int age = (int) result[3];
+
+            return new studDto(name, rollno, email, age);
+        } else {
+            // Handle the case where the result is not as expected
+            // You might want to throw an exception or return a default value
+            return null;
+        }
+    }
+
+    @Override
+    public void updateStudent(String rollno, studDto updatedStudentDto) {
+        // Find the student by rollno
+        Optional<Student> optionalStudent = studentRepository.findByRollno(rollno);
+
+        if (optionalStudent.isPresent()) {
+            // Update attributes based on studDto
+            Student existingStudent = optionalStudent.get();
+            existingStudent.setName(updatedStudentDto.getName());
+            existingStudent.setEmail(updatedStudentDto.getEmail());
+            existingStudent.setAge(updatedStudentDto.getAge());
+
+            // Save the updated student
+            studentRepository.save(existingStudent);
+        } else {
+
+            // Handle case where student with the given rollno is not found
+            // You may throw an exception or handle it according to your application's requirements
+        }
+    }
+
+    @Override
+    public StudentProjection getStudentNameDetail(String rollno) {
+        return studentRepository.findByRoll(rollno);
+    }
+
+    @Override
+    public Page<StudentProjection> getStudentDetailPagination(Pageable pageable) {
+        return studentRepository.findAllStudents(pageable);
+    }
+
+
 }
 
 

@@ -18,6 +18,8 @@ public class Guardian {
     private String name;
     private String email;
     private String phoneNo;
+    @OneToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
 
-    private Integer studentId;
 }

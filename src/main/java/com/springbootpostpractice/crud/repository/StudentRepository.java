@@ -1,16 +1,24 @@
 package com.springbootpostpractice.crud.repository;
 
+import com.springbootpostpractice.crud.dto.StudentDetail;
+import com.springbootpostpractice.crud.dto.studDto;
 import com.springbootpostpractice.crud.model.Student;
+import com.springbootpostpractice.crud.repository.Projection.StudentPageProjection;
 import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
-    public interface StudentRepository extends JpaRepository<Student, Integer>
+
+public interface StudentRepository extends JpaRepository<Student, Integer>
     {
+        List<StudentProjection> findAllProjectedBy();
         List<StudentProjection> findByAgeGreaterThan(int age);
         @Query(value = "SELECT name, rollno, age FROM student WHERE age < :age", nativeQuery = true)
         List<StudentProjection> findStudentsWithAgeLessThan(@Param("age") int age);
@@ -28,6 +36,19 @@ import java.util.List;
         @Query(value = "UPDATE student SET email = :email WHERE id = :studentId", nativeQuery = true)
         int updateStudentEmail(@Param("studentId") Integer studentId, @Param("email") String email);
 
+        @Query(value ="select e from Student e where e.age = :age ORDER BY e.name")
+        Page<StudentPageProjection> findAllStudentsByAge(
+                @Param("age") int age,
+                Pageable pageable
+                );
+
+
+        Optional<Student> findByRollno(String rollno);
+        @Query(value ="SELECT e from Student e WHERE e.rollno = :rollno")
+        StudentProjection findByRoll(@Param("rollno") String rollno);
+
+        @Query(value ="select e from Student e ")
+        Page<StudentProjection> findAllStudents(Pageable pageable);
 
 
 

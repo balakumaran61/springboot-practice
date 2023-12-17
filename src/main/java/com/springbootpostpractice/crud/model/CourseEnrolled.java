@@ -1,19 +1,22 @@
 package com.springbootpostpractice.crud.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
-public class CourseEnrolled
-{
+public class CourseEnrolled {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
-    private String courseCode;
+    private Integer id;
 
-    private Integer StudentId;
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
+
+    // Other fields and methods
 }

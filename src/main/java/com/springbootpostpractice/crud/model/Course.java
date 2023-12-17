@@ -1,11 +1,10 @@
 package com.springbootpostpractice.crud.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,4 +16,6 @@ public class Course {
     private String courseCode; // Change to courseCode to match JSON input
     private String name;
     private int fees;
+    @OneToMany(mappedBy = "course")
+    private List<CourseEnrolled> courseEnrollments;
 }

@@ -1,30 +1,33 @@
 package com.springbootpostpractice.crud.controller;
 
-import com.springbootpostpractice.crud.dto.StudentUpdateDto;
-import com.springbootpostpractice.crud.dto.studentDto;
+import com.springbootpostpractice.crud.dto.*;
 import com.springbootpostpractice.crud.model.Student;
+import com.springbootpostpractice.crud.repository.Projection.StudentPageProjection;
 import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
 import com.springbootpostpractice.crud.repository.StudentRepository;
 import com.springbootpostpractice.crud.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class StudentController
 {
     @Autowired
     StudentService studentService;
 
-
-
-    @GetMapping("/student")
-    public List<Student> getStudents()
+    @GetMapping("/studentDetail")
+    public List<StudentProjection> getStudents()
     {
         return studentService.getAllStudents();
     }
+
+
     @PostMapping("/store")
     public Student saveStudent(@RequestBody Student student)
     {
@@ -41,6 +44,10 @@ public class StudentController
     public studentDto getStudentName(@PathVariable Integer id) {
         return studentService.getStudentDetailsById(id);
     }
+    @GetMapping("/studentNameAndRollno/{rollno}")
+    public StudentProjection  getStudentNameDetail(@PathVariable String rollno) {
+        return studentService.getStudentNameDetail(rollno);
+    }
 
     @GetMapping("/byAgeGreaterThan")
     public List<studentDto> getStudentByAgeGreaterThan(@RequestParam int age) {
@@ -51,7 +58,8 @@ public class StudentController
         return studentService.getStudentsWithAgeLessThan(age);
     }
     @GetMapping("/students/byAge")
-    public List<studentDto> getStudentsByAge(@RequestParam int age) {
+    public List<studentDto> getStudentsByAge(@RequestParam int age)
+    {
         return studentService.getStudentsByAge(age);
     }
 
@@ -78,6 +86,44 @@ public class StudentController
     {
         return studentService.batchUpdateStudents(studentDtoList);
     }
+
+
+
+
+
+
+
+
+    @PostMapping("/student-save-em")
+    public String saveStudentUsingEm(@RequestBody Student student) {
+        return studentService.saveStudentUsingEm(student);
+    }
+
+    @GetMapping("/studentWithEM/{studentId}")
+    public studDto getStudentDetailsWithEM(@PathVariable Integer studentId) {
+        return studentService.getStudentDetailsWithEM(studentId);
+
+    }
+    @CrossOrigin(origins = "http://127.0.0.1:5500", methods = {RequestMethod.PUT})
+    // Update student by rollno
+    @PutMapping("updateStudent/{rollno}")
+    public void updateStudent(@PathVariable String rollno, @RequestBody studDto updatedStudent) {
+        studentService.updateStudent(rollno, updatedStudent);
+
+    }
+
+    // to do the pagination default
+    @GetMapping("/student-pagination")
+    public Page<StudentProjection> getStudentDetailPagination(@RequestParam int page, @RequestParam int size)
+    {  Pageable pageable = PageRequest.of(page, size);
+
+        return studentService.getStudentDetailPagination(pageable);
+    }
+
+
+
+
+
 
 
 
