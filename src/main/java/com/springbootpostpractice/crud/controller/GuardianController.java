@@ -1,16 +1,29 @@
 package com.springbootpostpractice.crud.controller;
 
 import com.springbootpostpractice.crud.dto.GuardianDto;
+import com.springbootpostpractice.crud.dto.studentDto;
+import com.springbootpostpractice.crud.dto.StudentWithCoursesDTO;
 import com.springbootpostpractice.crud.dto.StudentDetail;
+import com.springbootpostpractice.crud.dto.guardianUpdateDto;
+import com.springbootpostpractice.crud.dto.studDto;
 import com.springbootpostpractice.crud.model.Guardian;
 import com.springbootpostpractice.crud.model.Student;
+import com.springbootpostpractice.crud.repository.Projection.GuardianProjection;
+import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
 import com.springbootpostpractice.crud.service.GuardianService;
 import com.springbootpostpractice.crud.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.NoSuchElementException;
+
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 public class GuardianController {
     @Autowired
@@ -24,6 +37,32 @@ public class GuardianController {
     @GetMapping("/{guardianId}/student-details")
     public StudentDetail getStudentDetailsByGuardian(@PathVariable Integer guardianId) {
         return guardianService.getStudentDetailsByGuardianId(guardianId);
+    }
+    @GetMapping("/guardian-pagination")
+    public Page<GuardianProjection> getGuardianDetailPagination(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam(required = false, defaultValue = "name") String sortBy,
+            @RequestParam(required = false, defaultValue = "asc") String sortType,
+            @RequestParam(required = false) String search
+    ) {
+        Sort.Direction direction = sortType.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        return guardianService.getGuardianDetailPagination(pageable, search);
+    }
+
+
+     @GetMapping("/studentInfoByGuardianEmail/{guardianEmail}")
+    public ResponseEntity<studentDto> getStudentInfo(@PathVariable String guardianEmail) {
+        try {
+            studentDto studentInfo = guardianService.getStudentInfoByGuardianEmail(guardianEmail);
+            return ResponseEntity.ok(studentInfo);
+        }
+        catch (NoSuchElementException e)
+        {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 
