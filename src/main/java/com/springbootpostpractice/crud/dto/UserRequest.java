@@ -1,12 +1,12 @@
 package com.springbootpostpractice.crud.dto;
-
 import lombok.Data;
 
 @Data
-public class LoginResponse {
-
+public class UserRequest {
     private String username;
+    private String email;
+    private String name;
     private String userType;
-    // Constructors, getters, and setters
-    private String token;
+    private String password;
+
 }

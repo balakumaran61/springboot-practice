@@ -2,6 +2,7 @@ package com.springbootpostpractice.crud.controller;
 
 import com.springbootpostpractice.crud.dto.LoginResponse;
 import com.springbootpostpractice.crud.dto.UserLoginRequest;
+import com.springbootpostpractice.crud.dto.UserRequest;
 import com.springbootpostpractice.crud.model.User;
 import com.springbootpostpractice.crud.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +19,10 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/userRegister")
-    public User registerUser(@RequestBody User user)
-    {
-        return userService.registerUser(user);
+    public UserRequest registerUser(@RequestBody UserRequest userRequest) {
+        return userService.registerUser(userRequest);
     }
+
     @PostMapping("/login")
     public LoginResponse loginUser(@RequestBody UserLoginRequest userLoginRequest) {
         return userService.loginUser(userLoginRequest.getUsername(), userLoginRequest.getPassword());

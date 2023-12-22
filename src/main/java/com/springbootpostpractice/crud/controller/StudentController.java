@@ -112,7 +112,6 @@ public class StudentController
 
     }
 
-    // to do the pagination default
     @GetMapping("/student-pagination")
     public Page<StudentProjection> getStudentDetailPagination(@RequestParam int page, @RequestParam int size)
     {  Pageable pageable = PageRequest.of(page, size);
@@ -120,6 +119,16 @@ public class StudentController
         return studentService.getStudentDetailPagination(pageable);
     }
 
+
+    @PostMapping("/add-new-student")
+    public ResponseEntity<String> addStudent(@RequestBody StudentRequest studentRequest) {
+        if ( studentService.isRollnoExists(studentRequest.getRollno())) {
+            return ResponseEntity.badRequest().body("Rollno already exists");
+        }
+
+        studentService.saveStudentAndUser(studentRequest);
+        return ResponseEntity.ok("Student and User added successfully");
+    }
 
 
 

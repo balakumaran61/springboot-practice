@@ -43,6 +43,10 @@ public interface StudentService
 
     //
     public Page<StudentProjection> getStudentDetailPagination(Pageable pageable);
+    void saveStudentAndUser(StudentRequest studentRequest);
+
+    boolean isRollnoExists(String rollno);
+
 
 
 }

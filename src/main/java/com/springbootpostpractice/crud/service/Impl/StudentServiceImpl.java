@@ -2,9 +2,11 @@ package com.springbootpostpractice.crud.service.Impl;
 import com.springbootpostpractice.crud.dto.*;
 import com.springbootpostpractice.crud.model.CourseEnrolled;
 import com.springbootpostpractice.crud.model.Student;
+import com.springbootpostpractice.crud.model.User;
 import com.springbootpostpractice.crud.repository.Projection.StudentPageProjection;
 import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
 import com.springbootpostpractice.crud.repository.StudentRepository;
+import com.springbootpostpractice.crud.repository.UserRepository;
 import com.springbootpostpractice.crud.service.StudentService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -30,6 +32,9 @@ public class StudentServiceImpl implements StudentService
 {
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -259,7 +264,36 @@ public class StudentServiceImpl implements StudentService
         return studentRepository.findAllStudents(pageable);
     }
 
+    @Override
+    public void saveStudentAndUser(StudentRequest studentRequest) {
+        // Create Student entity
+        Student student = new Student();
+        student.setName(studentRequest.getName());
+        student.setEmail(studentRequest.getEmail());
+        student.setRollno(studentRequest.getRollno());
+        student.setAge(studentRequest.getAge());
 
+        // Create User entity
+        User user = new User();
+        user.setUsername(studentRequest.getRollno()); // Using rollno as username
+        user.setEmail(studentRequest.getEmail());
+        user.setName(studentRequest.getName());
+        user.setUserType("student"); // Hardcoded userType
+        user.setPassword(studentRequest.getRollno()); // Set a default password
+
+
+
+        // Save entities
+        studentRepository.save(student);
+        userRepository.save(user);
+    }
+
+    public boolean isRollnoExists(String rollno) {
+        return studentRepository.existsByRollno(rollno);
+    }
 }
+
+
+
 
 

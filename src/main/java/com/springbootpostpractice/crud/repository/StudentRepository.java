@@ -50,6 +50,9 @@ public interface StudentRepository extends JpaRepository<Student, Integer>
         @Query(value ="select e from Student e ")
         Page<StudentProjection> findAllStudents(Pageable pageable);
 
+        boolean existsByRollno(String rollno);
+
+
 
 
     }
