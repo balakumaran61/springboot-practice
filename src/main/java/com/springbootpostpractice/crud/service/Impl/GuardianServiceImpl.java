@@ -72,23 +72,29 @@ public class GuardianServiceImpl implements GuardianService
 
     // Assuming you have a method to find a guardian by email in your repository
 
-        @Override
-        public studentDto getStudentInfoByGuardianEmail(String guardianEmail) {
-            Guardian guardian = guardianRepository.findByEmail(guardianEmail)
-                    .orElseThrow(() -> new NoSuchElementException("Guardian not found"));
+    @Override
+    public StudentCourseDtoByGuardian getStudentInfoByGuardianEmail(String guardianEmail) {
+        Guardian guardian = guardianRepository.findByEmail(guardianEmail)
+                .orElseThrow(() -> new NoSuchElementException("Guardian not found"));
 
-            Student student = guardian.getStudent();
-            if (student == null) {
-                throw new NoSuchElementException("Student not found for guardian");
-            }
-
-            studentDto studentDto = new studentDto();
-            studentDto.setStudentId(student.getId());
-            studentDto.setName(student.getName());
-            studentDto.setRollno(student.getRollno());
-            studentDto.setEmail(student.getEmail());
-            studentDto.setAge(student.getAge());
-
-            return studentDto;
+        Student student = guardian.getStudent();
+        if (student == null) {
+            throw new NoSuchElementException("Student not found for guardian");
         }
+
+        List<String> enrolledCourses = student.getCourseEnrollments()
+                .stream()
+                .map(courseEnrollment -> courseEnrollment.getCourse().getName())
+                .collect(Collectors.toList());
+
+        return new StudentCourseDtoByGuardian(
+                student.getId(),
+                student.getName(),
+                student.getRollno(),
+                student.getEmail(),
+                student.getAge(),
+                enrolledCourses
+        );
+    }
+
 }
