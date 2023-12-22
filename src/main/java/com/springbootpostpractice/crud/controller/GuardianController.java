@@ -1,11 +1,6 @@
 package com.springbootpostpractice.crud.controller;
 
-import com.springbootpostpractice.crud.dto.GuardianDto;
-import com.springbootpostpractice.crud.dto.studentDto;
-import com.springbootpostpractice.crud.dto.StudentWithCoursesDTO;
-import com.springbootpostpractice.crud.dto.StudentDetail;
-import com.springbootpostpractice.crud.dto.guardianUpdateDto;
-import com.springbootpostpractice.crud.dto.studDto;
+import com.springbootpostpractice.crud.dto.*;
 import com.springbootpostpractice.crud.model.Guardian;
 import com.springbootpostpractice.crud.model.Student;
 import com.springbootpostpractice.crud.repository.Projection.GuardianProjection;
@@ -54,9 +49,9 @@ public class GuardianController {
 
 
      @GetMapping("/studentInfoByGuardianEmail/{guardianEmail}")
-    public ResponseEntity<studentDto> getStudentInfo(@PathVariable String guardianEmail) {
+    public ResponseEntity<StudentCourseDtoByGuardian> getStudentInfo(@PathVariable String guardianEmail) {
         try {
-            studentDto studentInfo = guardianService.getStudentInfoByGuardianEmail(guardianEmail);
+            StudentCourseDtoByGuardian studentInfo = guardianService.getStudentInfoByGuardianEmail(guardianEmail);
             return ResponseEntity.ok(studentInfo);
         }
         catch (NoSuchElementException e)
@@ -66,4 +61,13 @@ public class GuardianController {
     }
 
 
+    @PutMapping("/updateGuardian/{email}")
+    public   void updateGuardian(@PathVariable String email,@RequestBody guardianUpdateDto updatedGuardian)
+    {
+        guardianService.updateGuardian(email,updatedGuardian);
+    }
+
+            /*
+             void updateGuardian( String email,guardianUpdateDto updatedGuardian);
+             */
 }

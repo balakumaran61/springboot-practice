@@ -1,9 +1,6 @@
 package com.springbootpostpractice.crud.service;
 
-import com.springbootpostpractice.crud.dto.GuardianDto;
-import com.springbootpostpractice.crud.dto.StudentDetail;
-import com.springbootpostpractice.crud.dto.guardianUpdateDto;
-import com.springbootpostpractice.crud.dto.studentDto;
+import com.springbootpostpractice.crud.dto.*;
 import com.springbootpostpractice.crud.model.Guardian;
 import com.springbootpostpractice.crud.repository.Projection.GuardianProjection;
 import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
@@ -22,7 +19,7 @@ public interface GuardianService {
      Page<GuardianProjection> getGuardianDetailPagination(Pageable pageable,String search);
 
  void updateGuardian( String email,guardianUpdateDto updatedGuardian);
-    studentDto getStudentInfoByGuardianEmail(String guardianEmail);
+    StudentCourseDtoByGuardian getStudentInfoByGuardianEmail(String guardianEmail);
 
 
 }
