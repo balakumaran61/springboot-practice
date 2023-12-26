@@ -22,5 +22,7 @@ public interface GuardianRepository  extends JpaRepository<Guardian, Integer> {
             "lower(e.phoneNo) like %:search%")
     Page<GuardianProjection> findAllGuardians(Pageable pageable, @Param("search") String search);
     Optional<Guardian> findByEmail(String email);
+    Optional<Guardian> findByUsername(String username);
+
 
 }

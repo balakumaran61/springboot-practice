@@ -44,13 +44,21 @@ public interface StudentRepository extends JpaRepository<Student, Integer>
 
 
         Optional<Student> findByRollno(String rollno);
+
         @Query(value ="SELECT e from Student e WHERE e.rollno = :rollno")
         StudentProjection findByRoll(@Param("rollno") String rollno);
 
-        @Query(value ="select e from Student e ")
-        Page<StudentProjection> findAllStudents(Pageable pageable);
+        @Query("SELECT e FROM Student e " +
+                "WHERE " +
+                "   (:searchString IS NULL OR " +
+                "       e.name LIKE %:searchString% OR " +
+                "       e.email LIKE %:searchString% OR " +
+                "       e.rollno LIKE %:searchString%)")
+        Page<StudentProjection> findAllStudents(@Param("searchString") String searchString, Pageable pageable);
 
         boolean existsByRollno(String rollno);
+
+        Student findStudentByRollno(String rollno);
 
 
 

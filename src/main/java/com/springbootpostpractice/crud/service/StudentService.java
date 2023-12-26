@@ -42,11 +42,13 @@ public interface StudentService
 
 
     //
-    public Page<StudentProjection> getStudentDetailPagination(Pageable pageable);
+    public Page<StudentProjection> getStudentDetailPagination(String searchString,Pageable pageable);
     void saveStudentAndUser(StudentRequest studentRequest);
 
     boolean isRollnoExists(String rollno);
 
+    Student getStudentByRollNo(String rollNo);
+    studentDto getOneStudentDetail(String rollno);
 
 
 }

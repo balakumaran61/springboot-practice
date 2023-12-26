@@ -10,5 +10,6 @@ public interface UserService {
 
     UserRequest registerUser(UserRequest userRequest);
     LoginResponse loginUser(String username, String password);
+    boolean existsByUsername(String username);
 
 }

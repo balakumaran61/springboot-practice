@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -67,7 +68,29 @@ public class GuardianController {
         guardianService.updateGuardian(email,updatedGuardian);
     }
 
-            /*
-             void updateGuardian( String email,guardianUpdateDto updatedGuardian);
-             */
+    @PostMapping("/save-guardian")
+    public ResponseEntity<String> saveGuardian(@RequestBody SaveGuardianDTO guardianDTO) {
+        try {
+            ResponseEntity<String> result = guardianService.saveGuardian(guardianDTO);
+            return result;
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @GetMapping("/guardian-profile-info/{username}")
+    public ResponseEntity<GuadDto> getGuardianProfile(@PathVariable String username) {
+        GuadDto guardianProfile = guardianService.getGuardianProfile(username);
+
+        if (guardianProfile != null) {
+            return ResponseEntity.ok(guardianProfile);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+
+
 }

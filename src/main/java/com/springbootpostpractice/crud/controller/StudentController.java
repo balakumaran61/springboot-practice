@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -113,10 +114,13 @@ public class StudentController
     }
 
     @GetMapping("/student-pagination")
-    public Page<StudentProjection> getStudentDetailPagination(@RequestParam int page, @RequestParam int size)
-    {  Pageable pageable = PageRequest.of(page, size);
+    public Page<StudentProjection> getStudentDetailPagination(
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam(required = false) String searchString) {
 
-        return studentService.getStudentDetailPagination(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        return studentService.getStudentDetailPagination(searchString, pageable);
     }
 
 
@@ -131,7 +135,15 @@ public class StudentController
     }
 
 
-
+    @GetMapping("/student-profile-info/{rollno}")
+    public ResponseEntity<studentDto> getOneStudentDetail(@PathVariable String rollno) {
+        studentDto studenDto = studentService.getOneStudentDetail(rollno);
+        if (studenDto != null) {
+            return ResponseEntity.ok(studenDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 
 

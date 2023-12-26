@@ -3,17 +3,24 @@ package com.springbootpostpractice.crud.service.Impl;
 import com.springbootpostpractice.crud.dto.*;
 import com.springbootpostpractice.crud.model.Guardian;
 import com.springbootpostpractice.crud.model.Student;
+import com.springbootpostpractice.crud.model.User;
 import com.springbootpostpractice.crud.repository.GuardianRepository;
 import com.springbootpostpractice.crud.repository.Projection.GuardianProjection;
 import com.springbootpostpractice.crud.repository.Projection.StudentProjection;
+import com.springbootpostpractice.crud.repository.UserRepository;
 import com.springbootpostpractice.crud.service.GuardianService;
 import com.springbootpostpractice.crud.service.StudentService;
+import com.springbootpostpractice.crud.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,6 +34,14 @@ public class GuardianServiceImpl implements GuardianService
 
     @Autowired
     StudentService studentService;
+
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    UserRepository userRepository;
+
+
     @Override
     public Guardian createGuardian(GuardianDto guardianDto) {
         Guardian guardianToCreate = new Guardian();
@@ -96,5 +111,66 @@ public class GuardianServiceImpl implements GuardianService
                 enrolledCourses
         );
     }
+    @Override
+    @Transactional
+    public ResponseEntity<String> saveGuardian(SaveGuardianDTO guardianDTO) {
+        try {
+            Student student = studentService.getStudentByRollNo(guardianDTO.getStudentRollno());
 
+            if (student.getGuardian() != null) {
+                return new ResponseEntity<>("Guardian already exists for the given student.", HttpStatus.BAD_REQUEST);
+            }
+
+            if (userService.existsByUsername(guardianDTO.getUsername())) {
+                return new ResponseEntity<>("A guardian with the given username already exists.", HttpStatus.BAD_REQUEST);
+            }
+
+            Guardian guardian = new Guardian();
+            guardian.setName(guardianDTO.getName());
+            guardian.setEmail(guardianDTO.getEmail());
+            guardian.setPhoneNo(guardianDTO.getPhoneNo());
+            guardian.setUsername(guardianDTO.getUsername());
+            guardian.setStudent(student);
+
+            guardianRepository.save(guardian);
+
+            User user = new User();
+            user.setUsername(guardianDTO.getUsername());
+            user.setEmail(guardianDTO.getEmail());
+            user.setName(guardianDTO.getName());
+            user.setUserType("guardian");
+            user.setPassword(guardianDTO.getUsername());
+
+            userRepository.save(user);
+
+            return new ResponseEntity<>("Guardian and associated User saved successfully", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override
+    public GuadDto getGuardianProfile(String username) {
+        Optional<Guardian> guardianOptional = guardianRepository.findByUsername(username);
+        if (guardianOptional.isPresent()) {
+            return convertToDto(guardianOptional.get());
+        } else {
+            return null;
+        }
+    }
+
+    private GuadDto convertToDto(Guardian guardian) {
+        GuadDto dto = new GuadDto();
+        // Map fields from Guardian to GuardianDto
+        dto.setName(guardian.getName());
+        dto.setUsername(guardian.getUsername());
+        dto.setEmail(guardian.getEmail());
+        dto.setPhoneNo(guardian.getPhoneNo());
+        return dto;
+    }
 }
+
+
+
+
+

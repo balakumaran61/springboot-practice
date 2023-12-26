@@ -18,6 +18,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    //here registration is done only for teacher, others in their repsective controller and service
+
     @PostMapping("/userRegister")
     public UserRequest registerUser(@RequestBody UserRequest userRequest) {
         return userService.registerUser(userRequest);

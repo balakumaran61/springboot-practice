@@ -9,6 +9,7 @@ import com.springbootpostpractice.crud.repository.StudentRepository;
 import com.springbootpostpractice.crud.repository.UserRepository;
 import com.springbootpostpractice.crud.service.StudentService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
@@ -258,10 +259,9 @@ public class StudentServiceImpl implements StudentService
     public StudentProjection getStudentNameDetail(String rollno) {
         return studentRepository.findByRoll(rollno);
     }
-
     @Override
-    public Page<StudentProjection> getStudentDetailPagination(Pageable pageable) {
-        return studentRepository.findAllStudents(pageable);
+    public Page<StudentProjection> getStudentDetailPagination(String searchString, Pageable pageable) {
+        return studentRepository.findAllStudents(searchString, pageable);
     }
 
     @Override
@@ -291,6 +291,34 @@ public class StudentServiceImpl implements StudentService
     public boolean isRollnoExists(String rollno) {
         return studentRepository.existsByRollno(rollno);
     }
+
+    @Override
+    public Student getStudentByRollNo(String rollNo) {
+        // Use the existing repository method to find a student by roll number
+        return studentRepository.findByRollno(rollNo)
+                .orElseThrow(() -> new EntityNotFoundException("Student not found with roll number: " + rollNo));
+    }
+
+    @Override
+    public studentDto getOneStudentDetail(String rollno) {
+        Student student = studentRepository.findStudentByRollno(rollno);
+        if (student != null) {
+            return convertToDto(student);
+        } else {
+            return null;
+        }
+    }
+
+    private studentDto convertToDto(Student student) {
+        studentDto studenDto = new studentDto();
+        studenDto.setName(student.getName());
+        studenDto.setRollno(student.getRollno());
+        studenDto.setEmail(student.getEmail());
+        studenDto.setAge(student.getAge());
+        // Set other properties as needed
+        return studenDto;
+    }
+
 }
 
 
